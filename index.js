@@ -13,8 +13,7 @@ app.use(express.json());
 
 // MongoDB Connection URI
 
-const uri =
-  "mongodb+srv://bdCallingTask:0Mda6Ck8sCrcWXJE@project1.4j1y0pd.mongodb.net/?retryWrites=true&w=majority&appName=project1";
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@project1.4j1y0pd.mongodb.net/?retryWrites=true&w=majority&appName=project1`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
@@ -31,6 +30,7 @@ async function run() {
       .db("bdcalling-task")
       .collection("products");
     const reviewsCollection = client.db("bdcalling-task").collection("reviews");
+    const usersCollection = client.db("bdcalling-task").collection("users");
 
     //all products get
     app.get("/products", async (req, res) => {
@@ -80,6 +80,20 @@ async function run() {
       const productReview = req.body;
       const result = await reviewsCollection.insertOne(productReview);
       res.send(result);
+    });
+    // user saving in db
+
+    app.post("/users", async (req, res) => {
+      const doc = req.body;
+      console.log("the doc:", doc);
+      const query = { email: doc.email };
+      const existingUser = await usersCollection.findOne(query);
+      if (existingUser) {
+        return res.send({ message: "already exist" });
+      } else {
+        const result = await usersCollection.insertOne(doc);
+        res.send(result);
+      }
     });
 
     console.log(
