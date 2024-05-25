@@ -31,6 +31,9 @@ async function run() {
       .collection("products");
     const reviewsCollection = client.db("bdcalling-task").collection("reviews");
     const usersCollection = client.db("bdcalling-task").collection("users");
+    const cartDataCollection = client
+      .db("bdcalling-task")
+      .collection("cartData");
 
     //all products get
     app.get("/products", async (req, res) => {
@@ -79,6 +82,12 @@ async function run() {
     app.post("/addProductReview", async (req, res) => {
       const productReview = req.body;
       const result = await reviewsCollection.insertOne(productReview);
+      res.send(result);
+    });
+    //post operation of add a cart item
+    app.post("/cartdata", async (req, res) => {
+      const cartdata = req.body;
+      const result = await cartDataCollection.insertOne(cartdata);
       res.send(result);
     });
     // user saving in db
